@@ -36,8 +36,6 @@ def test_classification(classifier: QueryClassifier):
         result = classifier.classify(query)
         
         print(f"   유형: {result['query_type']}")
-        print(f"   확신도: {result['confidence']:.0%}")
-        print(f"   키워드: {result['key_entities']}")
         
         strategy = classifier.get_search_strategy(result['query_type'])
         print(f"   검색: {strategy['search_method']} (top_k={strategy['top_k']})\n")

@@ -12,7 +12,6 @@ from s4_EmbeddingManager import EmbeddingManager
 from s5_LegalSearchEngine import LegalSearchEngine
 from s62_GPTLegalSearchSystem import EnhancedLegalQASystem
 from s61_QueryClassifier import QueryClassifier
-import json
 from io import BytesIO
 from datetime import datetime
 
@@ -240,10 +239,6 @@ with st.sidebar:
     
     st.markdown("---")
     
-    # 상세 정보 토글
-    show_details = st.checkbox("🔍 상세 정보 표시", value=False)
-    
-    st.markdown("---")
     st.caption("💡 문서는 법령 기반이지만, 전문가 검토를 권장합니다.")
 
 # 세션 상태 초기화
@@ -269,14 +264,10 @@ for msg in st.session_state.messages:
             
             # 출처가 있을 때만 expander 표시
             if search_results:
-                # show_details에 따라 expanded 여부 결정
-                with st.expander("📚 근거 및 출처 보기", expanded=show_details):
+                with st.expander("📚 근거 및 출처 보기"):
                     
                     # 기본 정보
                     query_type = meta.get("query_type", "N/A")
-                    confidence = meta.get("classification", {}).get("confidence", 0)
-                    
-                    st.info(f"🏷️ **질문 유형:** {query_type} | **확신도:** {confidence:.0%}")
                     
                     st.markdown("---")
                     st.markdown(f"##### 🔍 검색된 청크 ({len(search_results)}개)")
@@ -306,7 +297,7 @@ for msg in st.session_state.messages:
                             key=f"chunk_{id(msg)}_{i}",
                             disabled=True,
                             label_visibility="collapsed"
-                        )                       
+                        )                        
                        
                         if i < len(search_results):
                             st.markdown("---")
@@ -371,8 +362,6 @@ if prompt := st.chat_input("질문을 입력하세요"):
             st.write("🏷️ 질문 유형 분석 중...")
             classification = classifier.classify(prompt)
             query_type = classification["query_type"]
-            confidence = classification["confidence"]
-            st.write(f"   ✅ **{query_type}** (확신도: {confidence:.0%})")
             
             # 2단계: 검색 전략
             st.write("🔍 검색 전략 결정 중...")
@@ -394,13 +383,6 @@ if prompt := st.chat_input("질문을 입력하세요"):
         # ===== 답변 표시 =====
         meta = answer.get("_meta", {})
         query_type = meta.get("query_type", "일반_정보_검색")
-        confidence = meta.get("classification", {}).get("confidence", 0)
-        
-        # 유형 배지
-        st.markdown(f"""
-        <span class="query-badge">{query_type}</span>
-        <span style="color: gray;"> (확신도: {confidence:.0%})</span>
-        """, unsafe_allow_html=True)
         
         st.markdown("---")
         

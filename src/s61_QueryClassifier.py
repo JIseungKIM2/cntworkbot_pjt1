@@ -70,17 +70,11 @@ class QueryClassifier:
 반드시 다음 JSON 형식으로만 답변하세요:
 
 {
-  "query_type": "위 6가지 유형 중 하나 (정확한 이름)",
-  "confidence": 0.0~1.0 (분류 확신도),
-  "reasoning": "이 유형으로 분류한 구체적인 이유",
-  "key_entities": ["질문에서 추출한 핵심 키워드들"],
-  "extracted_article": "제○조 (법조문 조회인 경우, 없으면 null)"
+  "query_type": "위 6가지 유형 중 하나 (정확한 이름)"
 }
 
 # 주의사항
 - 한 가지 유형으로만 분류하세요 (중복 불가)
-- 확신도는 정직하게 평가하세요
-- key_entities는 검색에 도움되는 명사/전문용어만 추출
 - 애매한 경우 "일반_정보_검색"을 기본값으로 사용
 """
     
@@ -116,18 +110,13 @@ class QueryClassifier:
             if result.get("query_type") not in valid_types:
                 print(f"⚠ 잘못된 유형: {result.get('query_type')}, 기본값 사용")
                 result["query_type"] = "일반_정보_검색"
-                result["confidence"] = 0.5
             
             return result
             
         except Exception as e:
             print(f"✗ 분류 실패: {e}")
             return {
-                "query_type": "일반_정보_검색",
-                "confidence": 0.5,
-                "reasoning": f"분류 실패: {str(e)}",
-                "key_entities": [],
-                "extracted_article": None
+                "query_type": "일반_정보_검색"
             }
     
     def get_search_strategy(self, query_type: str) -> Dict:
